@@ -14,7 +14,9 @@ sentences = [
              "the quick brown fox jumps over the lazy dog",
              "the lazy dog sleeps all day",
              "the quick brown fox is fast",
-             "the lazy cat sleeps all night"
+             "the lazy cat sleeps all night",
+    "the quick brown fox jumps over the lazy dog this is a sample text from the english wikipedia it contains only lowercase letters and spaces no punctuation or numbers the purpose is to demonstrate the format of text8 corpus you can use this text to test your word2vec implementation for larger scale training please download the real text8 dataset from the official source"
+
              ]
 sentence_list = " ".join(sentences).split()
 vocab = list(set(sentence_list))
@@ -24,7 +26,7 @@ vocab_size = len(vocab)
 
 # model parameters
 c = 2  # 窗口
-batch_size = 8
+batch_size = 16
 m = 2 # word embedding dim
 
 skip_grams = []
@@ -61,19 +63,26 @@ def train() :
     model = Word2Vec()
     loss_fn = nn.CrossEntropyLoss()
     optim = optimizer.Adam(model.parameters(), lr=1e-3)
-    for epoch in range(2000):
+
+    total_batches = len(loader)
+    print(f'每个epoch的批次数：{total_batches}')
+
+    for epoch in range(1000):
+        epoch_loss = 0
         for i , (batch_x , batch_y) in enumerate(loader) :
             batch_x = batch_x.to(device)
             batch_y = batch_y.to(device)
             pred = model(batch_x)
             loss = loss_fn(pred, batch_y)
 
-            if (epoch + 1 ) % 100 == 0:
-                print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch + 1, 2000, loss.item()))
             optim.zero_grad()
             loss.backward()
             optim.step()
+            epoch_loss += loss.item()
 
+            if (epoch + 1 ) % 100 == 0:
+                avg_loss = epoch_loss / total_batches
+                print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch + 1, 1000, avg_loss))
     for i, label in enumerate(vocab):
         w,wT = model.parameters ()
         x,y = float(w[i][0]),float(w[i][1])
