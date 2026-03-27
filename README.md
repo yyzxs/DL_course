@@ -13,4 +13,4 @@
 
 绘制图片
 
-![image-20260327191049578](C:\Users\yzx12\AppData\Roaming\Typora\typora-user-images\image-20260327191049578.png)
+![img.png](doc/word2vec.png)
