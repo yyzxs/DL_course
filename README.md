@@ -7,7 +7,7 @@
 
 ## 手搓word2vec训练三国演义
 
-![img.png](doc/word2vec_hand.png)
+![img.png](doc/wode2vec_hand.png)
 
 ## 调用gensim.models 中的 Word2Vec
 
