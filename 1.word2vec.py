@@ -11,13 +11,17 @@ dtype = torch.FloatTensor
 
 # 构建词汇表
 sentences = [
-             "the quick brown fox jumps over the lazy dog",
-             "the lazy dog sleeps all day",
-             "the quick brown fox is fast",
-             "the lazy cat sleeps all night",
-    "the quick brown fox jumps over the lazy dog this is a sample text from the english wikipedia it contains only lowercase letters and spaces no punctuation or numbers the purpose is to demonstrate the format of text8 corpus you can use this text to test your word2vec implementation for larger scale training please download the real text8 dataset from the official source"
-
-             ]
+"the quick brown fox jumps over the lazy dog",
+"the lazy dog sleeps all day",
+"the quick brown fox is fast",
+"the lazy cat sleeps all night",
+"apple banana fruit",
+"banana orange fruit",
+"orange banana fruit",
+"dog cat animal",
+"cat monkey animal",
+"monkey dog animal"
+]
 sentence_list = " ".join(sentences).split()
 vocab = list(set(sentence_list))
 word2idx = {w:i for i, w in enumerate(vocab)}
@@ -25,7 +29,7 @@ word2idx = {w:i for i, w in enumerate(vocab)}
 vocab_size = len(vocab)
 
 # model parameters
-c = 2  # 窗口
+c = 2  # window size
 batch_size = 16
 m = 2 # word embedding dim
 
@@ -60,6 +64,7 @@ class Word2Vec(nn.Module) :
         output = torch.mm(hidden,self.u) # [batch_size,vocab_size ]
         return output
 def train() :
+    torch.manual_seed(777)
     model = Word2Vec()
     loss_fn = nn.CrossEntropyLoss()
     optim = optimizer.Adam(model.parameters(), lr=1e-3)
@@ -84,7 +89,7 @@ def train() :
                 avg_loss = epoch_loss / total_batches
                 print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch + 1, 1000, avg_loss))
     for i, label in enumerate(vocab):
-        w,wT = model.parameters ()
+        w,wT = model.parameters()
         x,y = float(w[i][0]),float(w[i][1])
         plt.scatter(x, y)
         plt.annotate(label, xy=(x, y), xytext=(5, 2), textcoords='offset points', ha='right', va='bottom')
