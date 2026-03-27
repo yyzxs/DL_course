@@ -11,7 +11,7 @@ import time
 
 
 def load_text():
-    f = open("./data/sanguo.txt", 'r',encoding='utf-8')
+    f = open("data/sanguo.txt", 'r', encoding='utf-8')
     lines = []
     for line in f:
         temp = jieba.lcut(line)
