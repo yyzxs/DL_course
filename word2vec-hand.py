@@ -72,8 +72,10 @@ def make_dataset(skip_grams, vocab_size):
     return dataset
 
 def train(dataset, vocab_size):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     train_loader = DataLoader(dataset, batch_size=64, shuffle=True)
     model = Word2Vec(vocab_size, 100)
+    model = model.to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     epochs = 100
@@ -86,6 +88,8 @@ def train(dataset, vocab_size):
         
         for x, y in train_loader:
             model.train()
+            x = x.to(device)
+            y = y.to(device)
             y_pred = model(x)
             loss = criterion(y_pred, y)
             optimizer.zero_grad()
