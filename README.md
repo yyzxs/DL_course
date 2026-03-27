@@ -7,7 +7,7 @@
 
 ## 手搓word2vec训练三国演义
 
-![image-20260327184733800](C:\Users\yzx12\AppData\Roaming\Typora\typora-user-images\image-20260327184733800.png)
+![img.png](doc/word2vec_hand.png)
 
 ## 调用gensim.models 中的 Word2Vec
 
