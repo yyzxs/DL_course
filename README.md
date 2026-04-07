@@ -121,7 +121,7 @@ python gru_classifier.py
 2. 若 GPU 可用，程序会自动切换到 CUDA 运行，CPU 上训练约需 2~5 分钟。
 3. Attention 的 PAD mask 使用 `-1e9` 而非 `-inf`，防止全空文档导致 `softmax` 输出 NaN。
 =======
-# 自然语言处理课程作业
+# word2vec作业
 ## 1.word2vec.py的运行后的图
 
 ![img.png](class1/doc/img.png)
