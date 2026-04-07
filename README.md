@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 基于 GRU + Attention 的新闻文本二分类
 
 使用 PyTorch 实现的文本分类项目，在 20 Newsgroups 数据集的两个类别（无神论 vs 基督教）上完成二分类任务。
@@ -115,26 +114,32 @@ python gru_classifier.py
 
 ---
 
+## 实验结果
+
+| 指标 | 数值 |
+|------|------|
+| 测试集 Loss | 0.6468 |
+| 测试集 Accuracy | 71.55% |
+
+**分类报告：**
+
+```
+                        precision    recall  f1-score   support
+
+           alt.atheism       0.68      0.69      0.68       319
+soc.religion.christian       0.75      0.74      0.74       398
+
+              accuracy                           0.72       717
+             macro avg       0.71      0.71      0.71       717
+          weighted avg       0.72      0.72      0.72       717
+```
+
+`soc.religion.christian` 类别的精确率和召回率均略高于 `alt.atheism`，原因是该类样本量更多（398 vs 319），模型对其特征学习更充分。两类的 macro avg F1 达到 0.71，在移除了 headers/footers/quotes 等强特征后属于合理水平。
+
+---
+
 ## 注意事项
 
 1. 首次运行会自动从网络下载 20 Newsgroups 数据集（约 14 MB），需要网络连接。
 2. 若 GPU 可用，程序会自动切换到 CUDA 运行，CPU 上训练约需 2~5 分钟。
 3. Attention 的 PAD mask 使用 `-1e9` 而非 `-inf`，防止全空文档导致 `softmax` 输出 NaN。
-=======
-# 自然语言处理课程作业
-## 1.word2vec.py的运行后的图
-
-![img.png](doc/img.png)
-
-## 
-
-## 手搓word2vec训练三国演义
-
-![img.png](doc/wode2vec_hand.png)
-
-## 调用gensim.models 中的 Word2Vec
-
-绘制图片
-
-![img.png](doc/word2vec.png)
->>>>>>> 12b8df460b7f5bd23b8d562948ee563ecb9f181c
