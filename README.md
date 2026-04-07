@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 基于 GRU + Attention 的新闻文本二分类
 
 使用 PyTorch 实现的文本分类项目，在 20 Newsgroups 数据集的两个类别（无神论 vs 基督教）上完成二分类任务。
@@ -119,3 +120,21 @@ python gru_classifier.py
 1. 首次运行会自动从网络下载 20 Newsgroups 数据集（约 14 MB），需要网络连接。
 2. 若 GPU 可用，程序会自动切换到 CUDA 运行，CPU 上训练约需 2~5 分钟。
 3. Attention 的 PAD mask 使用 `-1e9` 而非 `-inf`，防止全空文档导致 `softmax` 输出 NaN。
+=======
+# 自然语言处理课程作业
+## 1.word2vec.py的运行后的图
+
+![img.png](doc/img.png)
+
+## 
+
+## 手搓word2vec训练三国演义
+
+![img.png](doc/wode2vec_hand.png)
+
+## 调用gensim.models 中的 Word2Vec
+
+绘制图片
+
+![img.png](doc/word2vec.png)
+>>>>>>> 12b8df460b7f5bd23b8d562948ee563ecb9f181c
