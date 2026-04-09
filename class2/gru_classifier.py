@@ -2,11 +2,7 @@
 基于1层双向GRU + Attention 的二分类模型
 类别: alt.atheism vs soc.religion.christian
 
-改进点（相比初版63%准确率）：
-  1. 词汇表用 train+val+test 全量数据构建 → 大幅减少测试集<UNK>比例
-  2. 加入 Attention 机制 → 模型聚焦关键词，不再只依赖末尾隐状态
-  3. 调高 hidden_size 与 embed_dim → 增加模型容量
-  4. 早停基于验证集 Accuracy（而非Loss）更贴近优化目标
+
 """
 
 import re
@@ -104,8 +100,7 @@ def load_data():
         random_state=SEED, stratify=y_all
     )
 
-    # ★ 关键改进1：词汇表用 train + val + test 全量文本构建
-    #   初版只用 X_train，导致测试集大量词变成 <UNK>，严重损害准确率
+    # ★ 词汇表用 train + val + test 全量文本构建
     word_to_idx = build_vocab(X_train + X_val + X_test, min_freq=CONFIG["min_freq"])
     vocab_size  = len(word_to_idx)
 
@@ -156,7 +151,7 @@ class GRUWithAttention(nn.Module):
     │  → Linear(2H → 1) + BCEWithLogitsLoss                       │
     └──────────────────────────────────────────────────────────────┘
 
-    ★ 关键改进2：Attention 替换"只取最后隐状态"
+    ★ Attention 替换"只取最后隐状态"
       - 最后隐状态只代表序列末尾，对长文本损失大量信息
       - Attention 对全部500个token加权求和，自动聚焦
         "atheism / atheist / god / christian / bible"等关键词
