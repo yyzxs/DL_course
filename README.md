@@ -113,6 +113,29 @@ python gru_classifier.py
 - **词汇表**：由训练集 + 验证集 + 测试集全量文本构建，避免测试集词汇大量变为 `<UNK>`
 
 ---
+---
+
+## 实验结果
+
+| 指标 | 数值 |
+|------|------|
+| 测试集 Loss | 0.6468 |
+| 测试集 Accuracy | 71.55% |
+
+**分类报告：**
+
+```
+                        precision    recall  f1-score   support
+
+           alt.atheism       0.68      0.69      0.68       319
+soc.religion.christian       0.75      0.74      0.74       398
+
+              accuracy                           0.72       717
+             macro avg       0.71      0.71      0.71       717
+          weighted avg       0.72      0.72      0.72       717
+```
+
+`soc.religion.christian` 类别的精确率和召回率均略高于 `alt.atheism`，原因是该类样本量更多（398 vs 319），模型对其特征学习更充分。两类的 macro avg F1 达到 0.71，在移除了 headers/footers/quotes 等强特征后属于合理水平。
 
 ## 实验结果
 
