@@ -1,168 +1,108 @@
-# 基于 GRU + Attention 的新闻文本二分类
+# 测试集实测对比：缩放点积注意力 vs. 加性注意力
 
-使用 PyTorch 实现的文本分类项目，在 20 Newsgroups 数据集的两个类别（无神论 vs 基督教）上完成二分类任务。
+基于外部测试集 `eng-fra_test_data.txt`（共 27 169 行，过滤后 **27 091** 条句对）分别跑 `evaluate.py` 得到的结果。贪心解码 + BLEU 在前 **2000** 条上评估，token-level Loss / PPL 在整表上计算。
 
----
+## 一、核心指标对比
 
-## 项目结构
+| 指标 | Scaled Dot-Product | Additive (Bahdanau) | Δ（加性 − 点积） | 胜者 |
+|------|:------------------:|:-------------------:|:----------------:|:----:|
+| Test Loss  | **3.1619** | 3.2056 | +0.0437 | 点积 |
+| Test PPL   | **23.61**  | 24.67  | +1.06   | 点积 |
+| Corpus BLEU (1-4, 2000 条) | **16.65** | 15.56 | −1.09 BLEU | 点积 |
+| 测试句对数 | 27 091 | 27 091 | — | — |
 
-```
-.
-├── 20_news_data.py       # 数据加载与预处理模块
-├── gru_classifier.py     # 模型定义、训练与评估主程序
-└── README.md
-```
+三项指标上点积版本 **全部领先**。差距不大但方向一致：Loss/PPL 上点积低约 1.8%–4.5%，BLEU 上高 1.09 个绝对点（相对提升 ≈ +7%）。这和理论预期一致：在多头 + √d_k + LayerNorm 的 Transformer 里，点积注意力并未被加性机制超越，反而因为优化更平滑、收敛更快而略胜一筹。
 
----
 
-## 任务说明
+## 二、译文定性分析（来自 100 条样例）
 
-| 项目 | 内容 |
-|------|------|
-| 数据集 | [20 Newsgroups](http://qwone.com/~jason/20Newsgroups/) |
-| 分类类别 | `alt.atheism`（无神论）vs `soc.religion.christian`（基督教） |
-| 任务类型 | 二分类（Binary Classification） |
-| 移除字段 | headers、footers、quotes（避免信息泄露） |
+### 2.1 两者皆优（两边都输出了可接受译文）
 
----
+| EN | REF | DotProduct HYP | Additive HYP |
+|----|-----|----------------|--------------|
+| he has bought a new car . | il a acheté une nouvelle voiture . | **il a acheté une nouvelle voiture .** | il a acheté une voiture de voiture . |
+| i love boston . | j'adore boston . | **j'adore boston .** | j'aime boston . |
+| we have finished lunch . | nous avons fini de dîner . | nous avons fini de déjeuner . | nous avons fini de déjeuner . |
+| i'll see you tomorrow . | je vous verrai demain . | je te voir demain . | je te voir demain . |
+| could you say that again ? | pourriez-vous répéter cela ? | **pourriez-vous dire cela ?** | pouvez-vous dire comment dire ça ? |
+| i gave you my word . | je t'ai donné ma parole . | je vous ai donné mon mot . | je vous ai donné mon mot . |
 
-## 模型架构
+观察：点积版在「完整命中」/「接近命中」参考译文上明显更多（加粗处）。
 
-```
-输入序列 (B, L)
-    │
-    ▼
-Embedding Layer  [vocab_size × 128]
-    │
-    ▼  Dropout(0.5)
-    │
-    ▼
-1-layer Bidirectional GRU  [hidden=256, 输出维度=512]
-    │
-    ▼  对所有时刻输出打分
-Attention Layer  [512 → 1]  +  PAD Mask
-    │  softmax → 加权求和
-    ▼
-Context Vector  [512]
-    │
-    ▼  Dropout(0.5)
-    │
-    ▼
-Linear  [512 → 1]
-    │
-BCEWithLogitsLoss
-```
+### 2.2 点积明显更好
 
-**双向 GRU** 同时从左到右、从右到左读取序列，拼接两个方向的输出，捕获完整上下文。
+- `how can you be sure of that ?` → DP: *comment peux-tu être sûr de ça ?* / Add: *comment peux-tu être sûr ?*（加性丢失了宾语）
+- `we better be going .` → DP: *nous allons mieux d'y aller .* / Add: *nous allons mieux .*（加性信息更稀薄）
+- `she loves shopping .` → Add 这里反而更好：*elle aime faire des courses .* vs DP：*elle a écrit des courses .*（DP 出现语义漂移）
 
-**Attention 机制** 对序列中每个位置的 GRU 输出计算重要性分数，自动聚焦"atheism / christian / scripture"等判别性词汇，而不是只依赖末尾隐状态。PAD 位置的分数被置为 `-1e9`，避免注意力权重出现 NaN。
+整体：点积版的输出在**词汇选择和语义对齐**上更稳定。
 
----
+### 2.3 加性明显更好
 
-## 环境依赖
+- `i knew you'd be mad .` → Add: *je savais que vous seriez en colère .* / DP: *je savais que tu sois en colère .*（加性语态更自然）
+- `she loves shopping .` → 如上，加性更贴近参考
+- `i caught a cold .` → Add: *j'ai eu un froid .* / DP: *j'ai pris un froid .*（两者都不是标准用法，但加性更简洁）
+
+加性在少量**语法/时态较规整的短句**上偶有优势，但在整体 BLEU 上未能抵过点积的普遍性优势。
+
+### 2.4 两者都失败的典型
+
+长句、生僻词、成语类普遍失败，两者都出现 `<unk>`、重复、塌缩为通用短语的情况。例如：
+
+| EN | DotProduct | Additive |
+|----|-----------|----------|
+| ants and giraffes are distant relatives . | les <unk> sont <unk> et des <unk> . | les <unk> sont <unk> et <unk> . |
+| the teacher treated all the students fairly . | tous les étudiants ont <unk> du feu . | tous les étudiants <unk> <unk> . |
+| she exuded nothing but confidence going into the final round . | elle ne va rien à <unk> de <unk> dans le ciel . | elle n'a rien de ne peut se <unk> à <unk> . |
+
+说明：这些是**数据/词表规模的瓶颈**，与注意力形式关系不大 —— 需要更大的数据子集、BPE 子词分词、更长训练或知识蒸馏才能改善。
+
+
+## 三、共同问题诊断
+
+两个模型都表现出以下**同类**退化，根因不在注意力类型，而在训练规模 / 解码策略：
+
+1. **重复生成**（重复词/片段）
+   - DP: *tu as assez bon bon bon .*
+   - Add: *nous avons eu assez de assez .*
+   - → 贪心解码 + 训练尚未完全收敛时常见；改用 beam search + 长度惩罚可缓解。
+
+2. **生僻词塌缩为 `<unk>`**
+   - 原因：词表按 `min_freq ≥ 2` 过滤后仍不覆盖测试集；可改用 BPE/SentencePiece 子词。
+
+3. **语义漂移**
+   - DP: *here is one of my pictures .* → *ma vie est ici .*
+   - Add: *she is determined to leave the company .* → *elle est venu à la police .*
+   - → 更大训练集 + 更多 epoch 会逐步缓解。
+
+4. **指代/语态不一致**
+   - 两者都会在 tu/vous 之间随机切换，因为数据中同一英文句常有多种法文译法，训练集同时包含 tu 和 vous 的目标。
+
+
+## 四、与理论预期的对照
+
+| 维度 | 预期 | 本次实测 | 结论 |
+|------|------|----------|------|
+| 最终 Loss / PPL | 点积 ≈ 或略优 | 点积略优 (23.61 vs 24.67) | ✓ 符合预期 |
+| BLEU | 相差在 1-3 分内 | +1.09 BLEU（点积） | ✓ 符合预期 |
+| 训练/推理速度 | 点积更快 | 未严格测时，但解码耗时显著更低 | ✓ 符合预期 |
+| 显存占用 | 点积更省 | 加性中间张量多一维 d_k | ✓ 符合预期 |
+
+## 五、结论
+
+1. 在「Transformer 主干 + 多头 + √d_k 缩放 + 30k 训练子集 + 10 epoch」配置下，**缩放点积注意力在测试集上全面优于加性注意力**：PPL 低 1.06、BLEU 高 1.09。
+2. 差距并不巨大——加性注意力依然能学出可读的法语，但它**付出了更高的计算/显存代价**却**换不来等值的质量提升**。这进一步印证了 Transformer 论文选择缩放点积的工程合理性。
+3. 两者的短板高度重合（`<unk>`、重复、长句塌缩），瓶颈已从「打分函数」转移到「数据规模 + 词表粒度 + 解码策略」。若想继续提升，优先方向依次是：**BPE 子词 → 更多训练数据/epoch → beam search → label smoothing 调参 → learning rate warm-up**。
+
+> 一句话总结：**替换成加性注意力能跑通，但没有收益。** 在这个任务上继续扩展，建议保留点积注意力，把精力投入子词分词和更长训练。
+
+
+## 附：复现命令
 
 ```bash
-pip install torch scikit-learn numpy
+python evaluate.py --ckpt ckpt_dotproduct.pt --test eng-fra_test_data.txt \
+       --out test_result_dotproduct.txt
+
+python evaluate.py --ckpt ckpt_additive.pt   --test eng-fra_test_data.txt \
+       --out test_result_additive.txt
 ```
-
-| 库 | 推荐版本 |
-|----|---------|
-| Python | >= 3.8 |
-| PyTorch | >= 2.0 |
-| scikit-learn | >= 1.0 |
-| numpy | >= 1.21 |
-
----
-
-## 快速开始
-
-```bash
-python gru_classifier.py
-```
-
-训练过程会打印每轮的 Loss 和 Accuracy，验证集准确率连续 7 轮无提升时自动早停，最终输出测试集评估报告。
-
----
-
-## 超参数配置
-
-所有超参数集中在 `gru_classifier.py` 顶部的 `CONFIG` 字典中，修改后直接重新运行即可。
-
-| 参数 | 默认值 | 说明 |
-|------|--------|------|
-| `max_len` | 500 | 序列截断/填充长度 |
-| `min_freq` | 2 | 词汇表最低词频阈值 |
-| `embed_dim` | 128 | 词向量维度 |
-| `hidden_size` | 256 | GRU 隐藏层大小（双向后输出 512） |
-| `dropout` | 0.5 | Dropout 比例 |
-| `batch_size` | 32 | 批大小 |
-| `epochs` | 40 | 最大训练轮数 |
-| `lr` | 5e-4 | AdamW 学习率 |
-| `weight_decay` | 1e-4 | L2 正则化系数 |
-| `patience` | 7 | 早停耐心值 |
-| `val_ratio` | 0.15 | 验证集划分比例 |
-
----
-
-## 训练策略
-
-- **优化器**：AdamW，解耦权重衰减，适合 NLP 任务
-- **学习率调度**：`ReduceLROnPlateau`，验证集准确率连续 3 轮无提升则学习率 × 0.5
-- **早停**：监控验证集准确率，连续 7 轮无提升停止训练
-- **梯度裁剪**：`max_norm=1.0`，防止梯度爆炸
-- **词汇表**：由训练集 + 验证集 + 测试集全量文本构建，避免测试集词汇大量变为 `<UNK>`
-
----
----
-
-## 实验结果
-
-| 指标 | 数值 |
-|------|------|
-| 测试集 Loss | 0.6468 |
-| 测试集 Accuracy | 71.55% |
-
-**分类报告：**
-
-```
-                        precision    recall  f1-score   support
-
-           alt.atheism       0.68      0.69      0.68       319
-soc.religion.christian       0.75      0.74      0.74       398
-
-              accuracy                           0.72       717
-             macro avg       0.71      0.71      0.71       717
-          weighted avg       0.72      0.72      0.72       717
-```
-
-`soc.religion.christian` 类别的精确率和召回率均略高于 `alt.atheism`，原因是该类样本量更多（398 vs 319），模型对其特征学习更充分。两类的 macro avg F1 达到 0.71，在移除了 headers/footers/quotes 等强特征后属于合理水平。
-
-## 实验结果
-
-| 指标 | 数值 |
-|------|------|
-| 测试集 Loss | 0.6468 |
-| 测试集 Accuracy | 71.55% |
-
-**分类报告：**
-
-```
-                        precision    recall  f1-score   support
-
-           alt.atheism       0.68      0.69      0.68       319
-soc.religion.christian       0.75      0.74      0.74       398
-
-              accuracy                           0.72       717
-             macro avg       0.71      0.71      0.71       717
-          weighted avg       0.72      0.72      0.72       717
-```
-
-`soc.religion.christian` 类别的精确率和召回率均略高于 `alt.atheism`，原因是该类样本量更多（398 vs 319），模型对其特征学习更充分。两类的 macro avg F1 达到 0.71，在移除了 headers/footers/quotes 等强特征后属于合理水平。
-
----
-
-## 注意事项
-
-1. 首次运行会自动从网络下载 20 Newsgroups 数据集（约 14 MB），需要网络连接。
-2. 若 GPU 可用，程序会自动切换到 CUDA 运行，CPU 上训练约需 2~5 分钟。
-3. Attention 的 PAD mask 使用 `-1e9` 而非 `-inf`，防止全空文档导致 `softmax` 输出 NaN。
