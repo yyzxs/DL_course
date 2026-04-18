@@ -51,14 +51,34 @@ def build_vocab(itos):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ckpt", required=True, help="checkpoint 路径 (ckpt_*.pt)")
-    parser.add_argument("--test", required=True, help="测试集路径 (eng \\t fra)")
-    parser.add_argument("--out", default="test_result.txt", help="详细结果输出文件")
+    # 设置默认值：直接点 Run 也能跑（前提是同目录下有 ckpt + test 文件）
+    parser.add_argument("--ckpt", default="ckpt_dotproduct.pt",
+                        help="checkpoint 路径 (ckpt_*.pt)，默认 ckpt_dotproduct.pt")
+    parser.add_argument("--test", default="eng-fra_test_data.txt",
+                        help="测试集路径 (eng \\t fra)")
+    parser.add_argument("--out", default=None,
+                        help="详细结果输出文件，缺省时按 ckpt 名自动命名")
     parser.add_argument("--max_len", type=int, default=20, help="训练时的句长过滤阈值")
     parser.add_argument("--decode_max_len", type=int, default=30)
     parser.add_argument("--max_eval", type=int, default=2000,
                         help="贪心解码 + BLEU 使用的前 N 条（整表 loss 仍用全集）")
     args = parser.parse_args()
+
+    # 友好校验：直接告诉用户缺哪个文件、在哪里找
+    if not Path(args.ckpt).exists():
+        print(f"[ERROR] 找不到 checkpoint 文件: {args.ckpt}")
+        print("        请先运行 transformer_dotproduct.py / transformer_additive.py 产出 ckpt_*.pt,")
+        print("        或通过 --ckpt <path> 指定 (PyCharm: Run -> Edit Configurations -> Script parameters)。")
+        return
+    if not Path(args.test).exists():
+        print(f"[ERROR] 找不到测试集文件: {args.test}")
+        print("        请把测试集放到当前工作目录, 或通过 --test <path> 指定。")
+        return
+    if args.out is None:
+        # 根据 ckpt 名字自动生成结果文件名, e.g. ckpt_dotproduct.pt -> test_result_dotproduct.txt
+        stem = Path(args.ckpt).stem
+        stem = stem.replace("ckpt_", "")
+        args.out = f"test_result_{stem}.txt"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     ckpt = torch.load(args.ckpt, map_location=device)
