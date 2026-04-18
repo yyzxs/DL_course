@@ -195,9 +195,8 @@ class MultiHeadAttention(nn.Module):
         K = self.W_k(key).view(B, -1, self.num_heads, self.d_k).transpose(1, 2)
         V = self.W_v(value).view(B, -1, self.num_heads, self.d_k).transpose(1, 2)
 
-        if mask is not None:
-            mask = mask.unsqueeze(1)  # [B, 1, L_q, L_k]
-
+        # 注意: make_src_mask 已返回 [B,1,1,L], make_tgt_mask 已返回 [B,1,L,L],
+        # 都是 4D、可直接与 scores [B,h,L_q,L_k] 广播, 无需再 unsqueeze。
         out, _ = self.attention(Q, K, V, mask=mask)
         # 合并多头: [B, h, L, d_k] -> [B, L, d]
         out = out.transpose(1, 2).contiguous().view(B, -1, self.d_model)
