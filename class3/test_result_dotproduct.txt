@@ -1,0 +1,410 @@
+=== Evaluation Summary ===
+ckpt              : ckpt_dotproduct.pt
+attention_type    : dotproduct
+test_file         : eng-fra_test_data.txt
+num test pairs    : 27091
+BLEU sample size  : 2000
+Test Loss         : 3.1619
+Test PPL          : 23.61
+Corpus BLEU (1-4) : 16.65
+
+=== Translations (first 100) ===
+EN : i gave you my word .
+REF: je t'ai donné ma parole .
+HYP: je vous ai donné mon mot .
+
+EN : i liked your idea and adopted it .
+REF: j'ai aimé ton idée et l'ai adopté .
+HYP: je l'ai idée et votre idée et ton idée .
+
+EN : let me help you put on your coat .
+REF: laissez-moi vous aider à mettre votre manteau .
+HYP: laissez-moi vous aider votre manteau .
+
+EN : how stupid he is !
+REF: quel imbécile il fait !
+HYP: c'est comme ça , c'est stupide !
+
+EN : i think that's highly unlikely .
+REF: je pense que c'est hautement improbable .
+HYP: je pense que c'est le fais de la tête .
+
+EN : if you do not have this book , you can buy it .
+REF: si vous ne disposez pas de ce livre , vous pouvez en faire l'acquisition .
+HYP: si tu ne peux pas le livre , tu le livre .
+
+EN : are you seriously thinking about selling this on ebay ?
+REF: pensez-vous sérieusement à vendre ça sur ebay ?
+HYP: es-tu en train de <unk> à <unk> cette <unk> ?
+
+EN : money is welcome everywhere .
+REF: l'argent est bienvenu partout .
+HYP: la route est d'argent .
+
+EN : did she say that ?
+REF: a-t-elle dit ça ?
+HYP: elle a fait cela ?
+
+EN : i don't care what's happened .
+REF: je me fiche de ce qui est arrivé .
+HYP: je ne fais pas ce qui est arrivé .
+
+EN : all her carefully made plans began to unravel one by one .
+REF: tous ses projets soigneusement conçus commencèrent à s'effondrer un à un .
+HYP: tout le monde a fait une personne à personne pour son <unk> .
+
+EN : how many of you are going ?
+REF: combien d'entre-vous partent-ils ?
+HYP: combien de fois ?
+
+EN : that's not the point .
+REF: ce n'est pas le sujet .
+HYP: ce n'est pas le point c'est <unk> .
+
+EN : you can't handle this alone .
+REF: vous ne pouvez pas gérer ça tout seul .
+HYP: tu ne peux pas te faire seul seul .
+
+EN : it looks like you've got a green thumb .
+REF: on dirait que tu as la main verte .
+HYP: tu as l'air comme un <unk> .
+
+EN : she is determined to leave the company .
+REF: elle est déterminée à quitter l'entreprise .
+HYP: elle est <unk> de la société .
+
+EN : the result was disappointing .
+REF: le résultat fut décevant .
+HYP: le <unk> était <unk> .
+
+EN : i can't stand it anymore .
+REF: je ne parviens plus à le supporter .
+HYP: je ne peux plus le dire .
+
+EN : i really need to talk to you privately .
+REF: il me faut vraiment te parler en privé .
+HYP: il me faut vraiment besoin de vous parler .
+
+EN : i did everything i could to help tom find a job .
+REF: j'ai fait tout mon possible pour aider tom à trouver un emploi .
+HYP: je pouvais tout à tom que j'ai fait un travail à tom .
+
+EN : i don't have a passport .
+REF: je ne dispose pas d'un passeport .
+HYP: je n'ai pas de moi .
+
+EN : you have a pretty good memory .
+REF: vous êtes doté d'une assez bonne mémoire .
+HYP: tu as assez bon bon bon .
+
+EN : i'll go anywhere you want .
+REF: j'irai où tu veux .
+HYP: je vais aller que tu veux .
+
+EN : what is critical thinking ?
+REF: qu'est-ce que la pensée critique ?
+HYP: quelle heure se trouve ?
+
+EN : these shoes are so tight that i can't put them on .
+REF: ces chaussures sont si serrées que je ne peux pas les mettre .
+HYP: je ne peux pas les choses que les enfants sont si <unk> .
+
+EN : tell me what i have to do .
+REF: dites-moi ce que j'ai à faire .
+HYP: il me faut faire ce que je dois faire .
+
+EN : please lend me the video when you have seen it .
+REF: s'il vous plaît prêtez-moi la vidéo quand vous l'aurez vue .
+HYP: veuillez me le vu , s'il vous plaît , s'il vous plaît .
+
+EN : i am in agreement with most of what he says .
+REF: je suis en accord avec l'essentiel de ce qu'il dit .
+HYP: je suis en train de ce qu'il dit de ce qu'il dit .
+
+EN : could you say that again ?
+REF: pourriez-vous répéter cela ?
+HYP: pourriez-vous dire cela ?
+
+EN : i have many friends i can talk to .
+REF: j'ai de nombreux amis auxquels je peux parler .
+HYP: je dois me rendre à avoir beaucoup amis .
+
+EN : they were stuck in the elevator for four hours .
+REF: ils sont restés coincés dans l'ascenseur pendant quatre heures .
+HYP: ils étaient <unk> pour la plage pour la plage .
+
+EN : everything's going to work out .
+REF: tout va bien se passer .
+HYP: va travailler au travail .
+
+EN : i think your english has improved a lot .
+REF: je pense que ton anglais s'est beaucoup amélioré .
+HYP: je pense que ton anglais est beaucoup anglais .
+
+EN : we've had enough of that .
+REF: nous en avons assez vu .
+HYP: nous avons assez de nous avons eu lieu .
+
+EN : you are the one .
+REF: tu es l'élu .
+HYP: tu es le monde .
+
+EN : i need envelopes .
+REF: j'ai besoin d'enveloppes .
+HYP: j'ai besoin de <unk> .
+
+EN : i need to go to sleep .
+REF: je dois aller dormir .
+HYP: il me faut aller à la nuit .
+
+EN : i belong to the baseball team .
+REF: j'appartiens à l'équipe de baseball .
+HYP: je vais au sujet de la ville .
+
+EN : we better be going .
+REF: on ferait mieux d'y aller .
+HYP: nous allons mieux d'y aller .
+
+EN : i wasn't strong enough .
+REF: je n'étais pas assez fort .
+HYP: je ne suis pas assez assez fort .
+
+EN : get on with it .
+REF: continuez !
+HYP: <unk> !
+
+EN : you're free to leave now .
+REF: tu est libre de partir maintenant .
+HYP: tu es maintenant .
+
+EN : i caught a cold .
+REF: je contractai un rhume .
+HYP: j'ai pris un froid .
+
+EN : the cat is licking itself .
+REF: le chat est en train de se lécher .
+HYP: le chat est la chat .
+
+EN : you remind me of somebody .
+REF: vous me rappelez quelqu'un .
+HYP: tu me suis reconnaissant de me faire du souci .
+
+EN : here is one of my pictures .
+REF: voici un de mes tableaux .
+HYP: ma vie est ici .
+
+EN : we have finished lunch .
+REF: nous avons fini de dîner .
+HYP: nous avons fini de déjeuner .
+
+EN : i just got there as fast as i could .
+REF: je m'y suis simplement rendue aussi vite que possible .
+HYP: je viens juste aussi vite que je pourrais .
+
+EN : i'll see you tomorrow .
+REF: je vous verrai demain .
+HYP: je te voir demain .
+
+EN : i knew you'd be mad .
+REF: je savais que vous seriez furieux .
+HYP: je savais que tu sois en colère .
+
+EN : are you having any difficulty doing that ?
+REF: as-tu des difficultés à faire cela ?
+HYP: es-tu en train de faire ça ?
+
+EN : it was gambling that brought about his ruin .
+REF: c'est le jeu qui entraîna sa ruine .
+HYP: c'était le faire de son fils était <unk> .
+
+EN : everyone pretended not to listen .
+REF: tout le monde faisait semblant de ne pas écouter .
+HYP: tout le monde ne <unk> pas à tout le monde .
+
+EN : françois has a good idea .
+REF: françois a une bonne idée .
+HYP: une bonne idée a une bonne idée .
+
+EN : ok , let's assume you're right .
+REF: d'accord , supposons que tu aies raison .
+HYP: tu es bien , <unk> .
+
+EN : how can you be sure of that ?
+REF: comment peux-tu en être sûre ?
+HYP: comment peux-tu être sûr de ça ?
+
+EN : i get asked that question a lot .
+REF: on me pose beaucoup cette question .
+HYP: je l'ai demandé beaucoup de question .
+
+EN : do you have any plans for tonight ?
+REF: as-tu des plans pour ce soir ?
+HYP: as-tu des problèmes pour ce soir ?
+
+EN : give me a hammer .
+REF: donnez-moi un marteau .
+HYP: <unk> un !
+
+EN : you should assume that anything you do online is public .
+REF: on doit supposer que tout ce qu'on fait en ligne est public .
+HYP: tu devrais faire quoi que ce soit d'autre est quelque chose de faire .
+
+EN : that meat is chicken .
+REF: cette viande , c'est du poulet .
+HYP: cette viande est <unk> .
+
+EN : she loves shopping .
+REF: elle adore faire les courses .
+HYP: elle a écrit des courses .
+
+EN : that should be kept between us .
+REF: que cela reste entre nous !
+HYP: on devrait être certain que nous devrions nous .
+
+EN : i don't deserve to be this happy .
+REF: je ne mérite pas d'être aussi heureuse .
+HYP: je ne suis pas heureux de ceci à ce soit heureux .
+
+EN : why would i tell anyone ?
+REF: pourquoi le dirais-je à quiconque ?
+HYP: pourquoi quiconque <unk> ?
+
+EN : tom looked in the refrigerator .
+REF: tom a regardé dans le frigidaire .
+HYP: tom a l'air en <unk> .
+
+EN : they are about to start .
+REF: ils sont sur le point de commencer .
+HYP: ils sont à des choses à la tête .
+
+EN : i bought it for about twelve dollars .
+REF: je l'ai acheté pour une douzaine de dollars .
+HYP: je l'ai acheté en colère pour ça .
+
+EN : i can't untie this knot .
+REF: je ne parviens pas à défaire ce nœud .
+HYP: je ne peux pas me <unk> cette <unk> .
+
+EN : i love boston .
+REF: j'adore boston .
+HYP: j'adore boston .
+
+EN : i just want to talk with you a little while .
+REF: je veux juste converser avec vous un petit moment .
+HYP: je veux juste que tu veux juste un peu de parler .
+
+EN : have you given any thought to having dinner with me ?
+REF: as-tu réfléchi le moins du monde à dîner avec moi ?
+HYP: avez-vous pensé à faire des dîner avec moi ?
+
+EN : i can't believe we finally made it .
+REF: je n'arrive pas à croire que nous y avons finalement réussi .
+HYP: je n'arrive pas à croire que nous pouvons le croire .
+
+EN : we can travel together .
+REF: nous pouvons voyager ensemble .
+HYP: nous pouvons nous pouvons faire ensemble .
+
+EN : she exuded nothing but confidence going into the final round .
+REF: rien n'émanait d'elle autre que la confiance en allant en phase finale .
+HYP: elle ne va rien à <unk> de <unk> dans le ciel .
+
+EN : i couldn't take that chance .
+REF: je n'ai pas pu saisir cette chance .
+HYP: je ne pouvais pas prendre ça .
+
+EN : i'm moving .
+REF: je suis en train de déménager .
+HYP: je suis <unk> .
+
+EN : this job is kind of boring .
+REF: ce boulot est plutôt ennuyeux .
+HYP: c'est un travail de travail .
+
+EN : i just don't want your dog in my house .
+REF: je ne veux tout simplement pas de ton chien dans ma maison .
+HYP: je ne veux pas simplement pas que ma maison dans ma maison .
+
+EN : when does he come ?
+REF: quand vient-il ?
+HYP: quand est-ce qu'il est venir ?
+
+EN : do you mind if we join you ?
+REF: voyez-vous un inconvénient à ce que nous nous joignions à vous ?
+HYP: <unk> un inconvénient à ce que nous <unk> à ce que nous <unk> ?
+
+EN : do you have any aspirin on you ?
+REF: avez-vous de l'aspirine avec vous ?
+HYP: as-tu des choses à la moindre ?
+
+EN : you can still see the ship .
+REF: on peut encore voir le bateau .
+HYP: tu peux toujours le voir .
+
+EN : he has bought a new car .
+REF: il a acheté une nouvelle voiture .
+HYP: il a acheté une nouvelle voiture .
+
+EN : go ahead .
+REF: passe devant !
+HYP: allez !
+
+EN : i'm not sure what it was , but it sounded like a gunshot .
+REF: je ne suis pas sûre de ce dont il s'agissait , mais ça a fait le bruit d'une détonation .
+HYP: je suis sûr de ne pas sûr mais ce que c'était un peu de ce que je suis <unk> .
+
+EN : i do not agree with you at all .
+REF: je ne suis pas du tout d'accord avec toi .
+HYP: je ne suis pas d'accord avec vous , tout ce que je suis d'accord .
+
+EN : i don't yet know what i'm going to do .
+REF: je ne sais pas encore ce que je vais faire .
+HYP: je ne sais pas encore faire ce que je vais faire .
+
+EN : you don't get it , do you ?
+REF: tu ne comprends pas , si ?
+HYP: vous ne <unk> pas , n'est-ce pas ?
+
+EN : tell me what to do here .
+REF: dites-moi quoi faire ici !
+HYP: dis-moi ce que je fais ici .
+
+EN : just pretend you don't know me .
+REF: fais semblant de ne pas me connaître .
+HYP: ne sais pas simplement moi ! tu ne me le sais pas simplement .
+
+EN : what does it cost to build a new house in this neighborhood ?
+REF: que coûte la construction d'une maison dans ce coin ?
+HYP: que cela <unk> une nouvelle maison à la maison ?
+
+EN : don't make me come back here .
+REF: ne me fais pas revenir ici !
+HYP: ne me fais pas ici !
+
+EN : would you be willing to help ?
+REF: serais-tu prêt à aider ?
+HYP: <unk> être en aider ?
+
+EN : would you like to have some tea ?
+REF: voudriez-vous un peu de thé ?
+HYP: voudriez-vous quelques thé ?
+
+EN : i didn't graduate .
+REF: je n'ai pas été diplômée .
+HYP: je n'ai pas vu .
+
+EN : i rescued you .
+REF: je vous ai sauvé .
+HYP: je vous ai fait mal .
+
+EN : we were terrified .
+REF: nous étions terrifiées .
+HYP: nous étions <unk> .
+
+EN : ants and giraffes are distant relatives .
+REF: les fourmis et les girafes sont des parents éloignés .
+HYP: les <unk> sont <unk> et des <unk> .
+
+EN : the teacher treated all the students fairly .
+REF: l'enseignant traita équitablement tous les étudiants .
+HYP: tous les étudiants ont <unk> du feu .
