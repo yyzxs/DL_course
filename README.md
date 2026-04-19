@@ -1,4 +1,213 @@
-# 测试集实测对比：缩放点积注意力 vs. 加性注意力
+#  hm4新闻文本二分类：GRU vs BERT
+
+使用 PyTorch 实现两种文本分类方案，在 20 Newsgroups 数据集的两个类别（无神论 vs 基督教）上完成二分类任务，并对比两种模型的效果。
+
+---
+
+## 项目结构
+
+```
+.
+├── bert_classifier.py    # 方案二：BERT 微调
+
+```
+
+---
+
+## 任务说明
+
+| 项目 | 内容 |
+|------|------|
+| 数据集 | [20 Newsgroups](http://qwone.com/~jason/20Newsgroups/) |
+| 分类类别 | `alt.atheism`（无神论）vs `soc.religion.christian`（基督教） |
+| 任务类型 | 二分类（Binary Classification） |
+| 移除字段 | headers、footers、quotes（避免标签泄露） |
+| 数据划分 | 训练集 / 验证集（15%）/ 测试集 |
+
+---
+
+## 方案一：双向 GRU + Attention
+
+### 模型架构
+
+```
+输入序列 (B, L)
+    │
+    ▼
+Embedding Layer  [vocab_size × 128]
+    │  Dropout(0.5)
+    ▼
+1-layer Bidirectional GRU  [hidden=256, 输出=512]
+    │  对所有时刻输出打分
+    ▼
+Attention Layer  [512→1] + PAD Mask(-1e9)
+    │  softmax → 加权求和
+    ▼
+Context Vector [512]
+    │  Dropout(0.5)
+    ▼
+Linear [512→1] → BCEWithLogitsLoss
+```
+
+### 超参数配置
+
+| 参数 | 值 | 说明 |
+|------|----|------|
+| `max_len` | 500 | 序列长度 |
+| `embed_dim` | 128 | 词向量维度 |
+| `hidden_size` | 256 | GRU 隐藏层（双向输出512） |
+| `dropout` | 0.5 | Dropout 率 |
+| `batch_size` | 32 | 批大小 |
+| `lr` | 5e-4 | AdamW 学习率 |
+| `weight_decay` | 1e-4 | L2 正则化 |
+| `patience` | 7 | 早停耐心值 |
+
+### 训练策略
+
+- 优化器：AdamW，解耦权重衰减
+- 调度器：`ReduceLROnPlateau`（验证集Acc连续3轮无提升则lr×0.5）
+- 早停：监控验证集准确率，连续7轮无提升停止
+- 梯度裁剪：`max_norm=1.0`
+- 词汇表：train + val + test 全量构建（减少测试集 `<UNK>`）
+
+### 运行
+
+```bash
+python gru_classifier.py
+```
+
+---
+
+## 方案二：BERT 微调
+
+### 模型架构
+
+```
+输入文本
+    │  BertTokenizer 分词（WordPiece，max_len=128）
+    ▼
+bert-base-uncased（12层 Transformer，768维，1.1亿参数）
+    │  取 [CLS] token 的 pooler_output 作为句子表示
+    ▼
+Dropout(0.1)
+    ▼
+Linear [768→1] → BCEWithLogitsLoss
+```
+
+### 超参数配置
+
+| 参数 | 值 | 说明 |
+|------|----|------|
+| `model_name` | bert-base-uncased | 预训练模型 |
+| `max_len` | 128 | Token 序列长度 |
+| `batch_size` | 16 | BERT 显存占用大，批较小 |
+| `lr` | 2e-5 | 微调标准学习率 |
+| `epochs` | 5 | 微调轮次少 |
+| `warmup_ratio` | 0.1 | 前10%步骤线性Warmup |
+
+### 训练策略
+
+- 优化器：AdamW（weight_decay=0.01）
+- 调度器：Linear Warmup → Constant LR
+- 早停：验证集准确率连续3轮无提升停止
+- 梯度裁剪：`max_norm=1.0`
+
+### 运行
+
+```bash
+pip install transformers
+python bert_classifier.py
+```
+
+> 首次运行自动下载 `bert-base-uncased` 预训练权重（约 440 MB）
+
+---
+
+## 实验结果对比
+
+### GRU + Attention 结果
+
+| 指标 | 数值 |
+|------|------|
+| 最佳验证集 Accuracy | 81.48% |
+| 测试集 Loss | 1.0626 |
+| 测试集 Accuracy | **73.36%** |
+
+```
+                        precision    recall  f1-score   support
+
+           alt.atheism       0.71      0.69      0.70       319
+soc.religion.christian       0.75      0.77      0.76       398
+
+              accuracy                           0.73       717
+             macro avg       0.73      0.73      0.73       717
+          weighted avg       0.73      0.73      0.73       717
+```
+
+### BERT 结果
+
+| 指标 | 数值 |
+|------|------|
+| 最佳验证集 Accuracy | 90.74% |
+| 测试集 Loss | 0.5180 |
+| 测试集 Accuracy | **82.43%** |
+
+```
+                        precision    recall  f1-score   support
+
+           alt.atheism       0.81      0.76      0.80       319
+soc.religion.christian       0.83      0.86      0.84       398
+
+              accuracy                           0.82       717
+             macro avg       0.82      0.82      0.82       717
+          weighted avg       0.82      0.82      0.82       717
+```
+
+### 两种方案对比
+
+| 对比维度 | GRU + Attention | BERT |
+|----------|----------------|------|
+| 测试集准确率 | 73.36% | **82.43%** |
+| 测试集 macro F1 | 0.73 | **0.82** |
+| alt.atheism F1 | 0.70 | **0.80** |
+| soc.religion.christian F1 | 0.76 | **0.84** |
+| 模型参数量 | ~300万 | ~1.1亿 |
+| 训练轮次 | ~20轮（早停） | 5轮 |
+| 词表 / 编码 | 自建词汇表（约1万词） | WordPiece（30522词） |
+| 序列建模方式 | 双向 GRU 逐步处理 | Transformer 全局自注意力 |
+| 预训练知识 | 无（从零训练） | 海量语料预训练 |
+
+---
+
+## 结果分析
+
+**GRU + Attention（73.36%）**
+
+模型从零训练，词向量随机初始化，仅依赖约 900 条训练样本学习语言表示。`alt.atheism` 与 `soc.religion.christian` 两类在词汇上高度重叠（都大量讨论 "god / religion / faith" 等），从头训练的 GRU 难以捕捉细微语义差异。Attention 机制已改善了只取末尾隐状态的信息损失问题，但瓶颈在于词向量表达能力不足，且 RNN 的序列递推结构对长距离依赖有天然的遗忘劣势。
+
+**BERT（82.43%）**
+
+BERT 在 BookCorpus + Wikipedia（共约 33 亿词）上完成预训练，[CLS] token 已携带丰富的上下文语义表示。微调阶段只需调整最后一层分类头，便能将预训练习得的语言理解能力直接迁移到本任务，仅用 5 轮训练即达到 82.43% 的准确率。Transformer 的全局自注意力机制可同时关注序列中任意位置的词对关系，不存在 RNN 的长距离依赖衰减问题，使得两类的 F1 均有显著提升。
+
+值得注意的是，BERT 的验证集准确率（90.74%）与测试集准确率（82.43%）存在一定落差，说明模型在验证集上略有过拟合，可通过增大 dropout、降低学习率或引入数据增强进一步改善。
+
+**核心差距来源**：BERT 领先 GRU 约 **9 个百分点**，优势本质上来自**预训练阶段积累的语言知识**，而非模型结构本身的复杂度。在同等参数量、同等数据量、从零训练的条件下，Transformer 并不一定优于 GRU；预训练 + 微调范式才是 BERT 在小样本场景下大幅超越传统序列模型的根本原因。
+
+---
+
+## 注意事项
+
+1. 首次运行会自动下载数据集（20 Newsgroups，约14 MB）和 BERT 权重（约440 MB），需要网络连接。
+2. GPU 可用时程序自动切换到 CUDA；BERT 在 CPU 上训练较慢，建议使用 GPU。
+3. GRU 的 Attention PAD mask 使用 `-1e9` 而非 `-inf`，防止全空文档导致 `softmax` 输出 NaN。
+
+
+
+
+
+
+
+# hm3测试集实测对比：缩放点积注意力 vs. 加性注意力
 
 基于外部测试集 `eng-fra_test_data.txt`（共 27 169 行，过滤后 **27 091** 条句对）分别跑 `evaluate.py` 得到的结果。贪心解码 + BLEU 在前 **2000** 条上评估，token-level Loss / PPL 在整表上计算。
 
